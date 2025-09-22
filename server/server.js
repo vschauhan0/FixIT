@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb+srv://vanshchauhan:%23vansh%401786@cluster0.5cm4oh1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/fixit", {
+  .connect(process.env.MONGODB_URI || "mongodb+srv://vanshchauhan:%23vansh%401786@cluster0.5cm4oh1.mongodb.net/fixit?retryWrites=true&w=majority&appName=Cluster0", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

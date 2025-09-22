@@ -18,7 +18,7 @@ const testAPI = async () => {
       name: "Test User",
       email: "test@example.com",
       password: "password123",
-      phone: "+1234567890",
+      phone: "1234567890",
       userType: "customer",
       address: {
         street: "123 Test St",
