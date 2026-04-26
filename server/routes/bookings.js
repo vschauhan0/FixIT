@@ -2,6 +2,7 @@ const express = require("express")
 const Booking = require("../models/Booking")
 const Worker = require("../models/Worker")
 const User = require("../models/User")
+const Review = require("../models/Review")
 const auth = require("../middleware/auth")
 
 const router = express.Router()
@@ -364,6 +365,18 @@ router.post("/:id/review", auth, async (req, res) => {
       createdAt: new Date()
     }
     await booking.save()
+    console.log("✅ Review added to booking:", booking._id)
+
+    // Create standalone Review document for the Worker Profile
+    const standaloneReview = new Review({
+      bookingId: booking._id,
+      customerId: req.user.userId,
+      workerId: booking.workerId,
+      rating,
+      comment
+    })
+    await standaloneReview.save()
+    console.log("✅ Standalone review created:", standaloneReview._id)
 
     // Recalculate average rating for the worker
     const workerBookings = await Booking.find({ 
@@ -381,6 +394,7 @@ router.post("/:id/review", auth, async (req, res) => {
       worker.rating.average = Number(averageRating)
       worker.rating.count = reviewCount
       await worker.save()
+      console.log("✅ Worker rating updated:", worker._id, "New average:", averageRating)
     }
 
     res.json({
@@ -389,8 +403,8 @@ router.post("/:id/review", auth, async (req, res) => {
       booking
     })
   } catch (error) {
-    console.error("Submit review error:", error)
-    res.status(500).json({ success: false, message: "Server error" })
+    console.error("❌ Submit review error:", error)
+    res.status(500).json({ success: false, message: "Server error", error: error.message })
   }
 })
 
