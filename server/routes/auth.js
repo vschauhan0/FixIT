@@ -93,7 +93,6 @@ router.post(
       res.status(500).json({
         success: false,
         message: "Server error during registration",
-        error: error.message,
       })
     }
   },
@@ -159,7 +158,6 @@ router.post(
       res.status(500).json({
         success: false,
         message: "Server error during login",
-        error: error.message,
       })
     }
   },
