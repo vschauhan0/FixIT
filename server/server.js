@@ -37,12 +37,33 @@ const connectDB = async () => {
     console.log("✅ MongoDB connected successfully")
   } catch (err) {
     console.error("❌ MongoDB connection error:", err)
+    throw err
   }
 }
 
-connectDB()
+// Database Connection Middleware for Serverless
+const dbMiddleware = async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Database connection failed",
+      error: err.message,
+    })
+  }
+}
+
+// Check for required environment variables
+const requiredEnv = ["MONGODB_URI", "JWT_SECRET"]
+const missingEnv = requiredEnv.filter((env) => !process.env[env])
+if (missingEnv.length > 0) {
+  console.warn(`⚠️ Warning: Missing environment variables: ${missingEnv.join(", ")}`)
+}
 
 // Routes
+app.use(dbMiddleware) // Ensure DB is connected for all routes
 app.use("/api/auth", authLimiter, authRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/workers", workerRoutes)
