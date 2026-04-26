@@ -29,10 +29,18 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 
 // MongoDB Connection
 const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/fixit"
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err))
+
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return
+  try {
+    await mongoose.connect(MONGO_URI)
+    console.log("✅ MongoDB connected successfully")
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err)
+  }
+}
+
+connectDB()
 
 // Routes
 app.use("/api/auth", authLimiter, authRoutes)
@@ -62,17 +70,22 @@ app.use((req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler)
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`)
-  console.log(`📱 Environment: ${process.env.NODE_ENV || "development"}`)
-  console.log(`🌐 API URL: http://localhost:${PORT}`)
-})
-
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (err, promise) => {
-  console.log("❌ Unhandled Promise Rejection:", err.message)
-  // Close server & exit process
-  server.close(() => {
-    process.exit(1)
+// Start server only if not being imported (e.g. for Vercel)
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`)
+    console.log(`📱 Environment: ${process.env.NODE_ENV || "development"}`)
+    console.log(`🌐 API URL: http://localhost:${PORT}`)
   })
-})
+
+  // Handle unhandled promise rejections
+  process.on("unhandledRejection", (err, promise) => {
+    console.log("❌ Unhandled Promise Rejection:", err.message)
+    // Close server & exit process
+    server.close(() => {
+      process.exit(1)
+    })
+  })
+}
+
+module.exports = app

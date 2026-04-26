@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cd client && npx vite",
-    "build": "cd client && npx vite build",
-    "start": "cd client && npx vite preview",
-    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "npm run dev:client",
+    "build": "cd client && npm run build",
+    "start": "node server/server.js",
+    "lint": "cd client && npm run lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
